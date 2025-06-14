@@ -4,4 +4,4 @@ pillow
 rembg
 scikit-learn
 opencv-python-headless
-+onnxruntime
+onnxruntime

@@ -92,32 +92,55 @@ flamo_assignment/
 
 ## 🚀 How to Run
 
-### 1. Harmonize and Relight the Person
+
+### 1. Prepare the person cutout and mask
+
+```bash
+python prepare_person.py person.jpg 
+```
+
+### 2. Generate hard & soft shadow masks from the background
+
+```bash
+python shadow_detect.py background.jpg 
+```
+
+### 3. Estimate the sun (light) direction from the hard shadow mask
+
+```bash
+python estimate_light_direction.py shadow_hard.png
+```
+
+
+### 4. Harmonize and Relight the Person
 
 ```bash
 python harmonize_relight.py \
   --fg_rgba person_rgba.png \
   --fg_mask person_mask.png \
   --bg background.jpg \
-  --sun 0.996 -0.084 \
-  --key 0.9 --fill 0.3 \
+  --sun <Lx> <Ly> \
+  --key 0.9 \
+  --fill 0.3 \
   --out person_harmonized.png
 ```
 
-### 2. Generate Shadow
+### 5. Generate Shadow
 
 ```bash
-python make_shadow.py person_mask.png --sun 0.996 -0.084
+python make_shadow.py person_mask.png \
+  --sun <Lx> <Ly> \
+  --out person_shadow_combined.png
 ```
 
-### 3. Composite Final Output
+### 6. Composite Final Output
 
 ```bash
 python composite_final.py \
   --bg background.jpg \
   --fg person_harmonized.png \
   --sh person_shadow_combined.png \
-  --scale 0.75 \
+  --scale 0.6 \
   --out final_composite.png
 ```
 

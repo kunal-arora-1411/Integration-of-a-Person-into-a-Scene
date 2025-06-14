@@ -95,5 +95,9 @@ if person_file and bg_file:
                 "--out", f"{UPLOAD_DIR}/final_composite.png"
             ])
 
-        st.success("🎉 Integration Complete!")
-        st.image(f"{UPLOAD_DIR}/final_composite.png", caption="Final Composite", use_column_width=True)
+        final_path = f"{UPLOAD_DIR}/final_composite.png"
+        if os.path.exists(final_path) and os.path.getsize(final_path) > 0:
+            st.success("🎉 Integration Complete!")
+            st.image(final_path, caption="Final Composite", use_container_width=True)
+        else:
+            st.error("❌ Final composite image not found or is empty. Check logs.")

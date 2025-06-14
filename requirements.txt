@@ -1,6 +1,6 @@
 streamlit
-opencv-python
 numpy
 pillow
 rembg
 scikit-learn
+opencv-python-headless

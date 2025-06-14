@@ -61,8 +61,7 @@ if person_file and bg_file:
                     sun_x, sun_y = float(sun_vec[0]), float(sun_vec[1])
                     st.success(f"☀️ Sun direction extracted: ({sun_x:.3f}, {sun_y:.3f})")
                 except Exception as e:
-                    st.error(f"❌ Failed to parse sun direction.
-{e}")
+                    st.error(f"❌ Failed to parse sun direction. Error: {str(e)}")
             else:
                 if os.path.exists(shadow_path) and os.path.getsize(shadow_path) > 0:
                     st.image(shadow_path, caption="Detected Hard Shadows")

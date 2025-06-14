@@ -50,21 +50,22 @@ if person_file and bg_file:
             )
             st.text(result.stdout)
             lines = result.stdout.splitlines()
-            try:
-                sun_line = next((line for line in lines if "Estimated sun direction" in line), None)
-                if sun_line:
+            sun_line = next((line for line in lines if "Estimated sun direction" in line), None)
+
+            if sun_line:
+                try:
                     sun_vec = sun_line.split("=")[1].strip().replace("(", "").replace(")", "").split(",")
                     sun_x, sun_y = float(sun_vec[0]), float(sun_vec[1])
-                else:
+                    st.success(f"☀️ Sun direction extracted: ({sun_x:.3f}, {sun_y:.3f})")
+                except Exception as e:
+                    st.error(f"❌ Failed to parse sun direction.\n{e}")
                     st.image(f"{UPLOAD_DIR}/shadow_hard.png", caption="Detected Hard Shadows")
-                    st.error("❌ Failed to extract sun direction.\nOutput:\n" + result.stdout)
                     st.stop()
+            else:
+                st.image(f"{UPLOAD_DIR}/shadow_hard.png", caption="Detected Hard Shadows")
+                st.warning("⚠️ Sun direction not found. Using default direction: (1.0, -0.2)")
+                sun_x, sun_y = 1.0, -0.2  # Fallback light direction
 
-                sun_vec = sun_line.split("=")[1].strip().replace("(", "").replace(")", "").split(",")
-                sun_x, sun_y = float(sun_vec[0]), float(sun_vec[1])
-            except Exception:
-                st.error("Failed to extract sun direction.")
-                st.stop()
 
         with st.spinner("Step 4: Harmonizing and relighting person..."):
             subprocess.run([

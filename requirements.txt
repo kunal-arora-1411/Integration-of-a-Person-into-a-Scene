@@ -1,6 +1,6 @@
-opencv-python
 streamlit
-rembg
-python
+opencv-python
 numpy
 pillow
+rembg
+scikit-learn

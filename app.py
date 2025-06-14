@@ -61,4 +61,44 @@ if person_file and bg_file:
                     sun_x, sun_y = float(sun_vec[0]), float(sun_vec[1])
                     st.success(f"☀️ Sun direction extracted: ({sun_x:.3f}, {sun_y:.3f})")
                 except Exception as e:
-                    st.error(f"❌ Failed to parse sun d
+                    st.error(f"❌ Failed to parse sun direction. Error: {str(e)}")
+            else:
+                if os.path.exists(shadow_path) and os.path.getsize(shadow_path) > 0:
+                    st.image(shadow_path, caption="Detected Hard Shadows")
+                st.warning("⚠️ Sun direction not found. Using default direction: (1.0, -0.2)")
+
+        with st.spinner("Step 4: Harmonizing and relighting person..."):
+            subprocess.run([
+                "python", "harmonize_relight.py",
+                "--fg_rgba", f"{UPLOAD_DIR}/person_rgba.png",
+                "--fg_mask", f"{UPLOAD_DIR}/person_mask.png",
+                "--bg", bg_path,
+                "--sun", str(sun_x), str(sun_y),
+                "--key", "0.9", "--fill", "0.3",
+                "--out", f"{UPLOAD_DIR}/person_harmonized.png"
+            ])
+
+        with st.spinner("Step 5: Generating shadows..."):
+            subprocess.run([
+                "python", "make_shadow.py", f"{UPLOAD_DIR}/person_mask.png",
+                "--sun", str(sun_x), str(sun_y),
+                "--out", f"{UPLOAD_DIR}/person_shadow_combined.png"
+            ])
+
+        with st.spinner("Step 6: Final compositing..."):
+            result = subprocess.run([
+                "python", "composite_final.py",
+                "--bg", bg_path,
+                "--fg", f"{UPLOAD_DIR}/person_harmonized.png",
+                "--sh", f"{UPLOAD_DIR}/person_shadow_combined.png",
+                "--scale", "0.75",
+                "--out", f"{UPLOAD_DIR}/final_composite.png"
+            ], capture_output=True, text=True)
+            st.text("Composite Output:\n" + result.stdout + "\n" + result.stderr)
+
+        final_path = f"{UPLOAD_DIR}/final_composite.png"
+        if os.path.exists(final_path) and os.path.getsize(final_path) > 0:
+            st.success("🎉 Integration Complete!")
+            st.image(final_path, caption="Final Composite", use_container_width=True)
+        else:
+            st.error("❌ Final composite image not found or is empty. Check logs.")

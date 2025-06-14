@@ -56,6 +56,7 @@ if person_file and bg_file:
                     sun_vec = sun_line.split("=")[1].strip().replace("(", "").replace(")", "").split(",")
                     sun_x, sun_y = float(sun_vec[0]), float(sun_vec[1])
                 else:
+                    st.image(f"{UPLOAD_DIR}/shadow_hard.png", caption="Detected Hard Shadows")
                     st.error("❌ Failed to extract sun direction.\nOutput:\n" + result.stdout)
                     st.stop()
 

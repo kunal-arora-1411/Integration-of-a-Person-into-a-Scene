@@ -43,9 +43,12 @@ if person_file and bg_file:
                 "--soft", f"{UPLOAD_DIR}/shadow_soft.png"
             ])
 
+        shadow_path = f"{UPLOAD_DIR}/shadow_hard.png"
+        sun_x, sun_y = 1.0, -0.2  # fallback default sun direction
+
         with st.spinner("Step 3: Estimating light direction..."):
             result = subprocess.run(
-                ["python", "estimate_light_direction.py", f"{UPLOAD_DIR}/shadow_hard.png"],
+                ["python", "estimate_light_direction.py", shadow_path],
                 capture_output=True, text=True
             )
             st.text(result.stdout)
@@ -58,14 +61,12 @@ if person_file and bg_file:
                     sun_x, sun_y = float(sun_vec[0]), float(sun_vec[1])
                     st.success(f"☀️ Sun direction extracted: ({sun_x:.3f}, {sun_y:.3f})")
                 except Exception as e:
-                    st.error(f"❌ Failed to parse sun direction.\n{e}")
-                    st.image(f"{UPLOAD_DIR}/shadow_hard.png", caption="Detected Hard Shadows")
-                    st.stop()
+                    st.error(f"❌ Failed to parse sun direction.
+{e}")
             else:
-                st.image(f"{UPLOAD_DIR}/shadow_hard.png", caption="Detected Hard Shadows")
+                if os.path.exists(shadow_path) and os.path.getsize(shadow_path) > 0:
+                    st.image(shadow_path, caption="Detected Hard Shadows")
                 st.warning("⚠️ Sun direction not found. Using default direction: (1.0, -0.2)")
-                sun_x, sun_y = 1.0, -0.2  # Fallback light direction
-
 
         with st.spinner("Step 4: Harmonizing and relighting person..."):
             subprocess.run([
